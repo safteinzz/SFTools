@@ -1,19 +1,25 @@
 # SaFteiNZzTools
 
-Programa con interfaz simple para diferentes funcionalidades en sistema operativo windows:
+### ¿What is?
 
-  Caracteristicas:
-  
-  Borrado:
-    - Forzar borrado de archivos bloqueados por el sistema
-    - Forzar borrado recursivo de carpetas bloqueadas por el sistema o que contienen algun archivo bloqueado
-  
-  Reparaciones:
-    - Reparación de explorer de windows
-    - Reparación de darklight de windows     
-    - Recuperar microsoft photo viewer (visualizador de imagenes de windows 7)
-  
-  Descargas:
-    - Descargar videos de youtube a mp3
-    - Descargar playlists de youtube a mp3
-     
+This is a simple application with interface that features different fixes and tools mostly for windows operating system computers
+
+
+## Features
+
+### Deleting
+- Force deleting of files locked by the system for what ever reason
+- Force recursive deleting of folder locked for the system or that have inside them any file locked by the system
+
+### Fixes
+
+Some of this changes requiere adding or editing the register of windows
+- Explorer or any kind of bug in navigation for the current session
+- Darklight not working properly    
+- Get back old microsoft photo viewer from win 7
+
+### Downloads
+
+- Download youtube videos to mp3 192Kbps
+- Download youtube playlist to mp3 videos 192Kbps in *one go*
+
