@@ -1,4 +1,4 @@
-# SaFteiNZzTools
+# SFTools
 
 ### ¿What is?
 
