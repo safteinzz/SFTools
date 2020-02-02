@@ -19,7 +19,7 @@ import os
 import win32com.shell.shell as shell
 
 
-#youtube conversor
+#youtube conversor (https://ytdl-org.github.io/youtube-dl/index.html)
 import youtube_dl
 
 
@@ -79,7 +79,9 @@ def seleccionarFichero(filtro, guardar, carpetas):
             return QFileDialog.getSaveFileName(qFD,"Seleccionar archivo", "",filtro)
 
 
-
+# =============================================================================
+# ~Buscar proceso en los procesos del sistema
+# =============================================================================
 def has_handle(fpath):
     for proc in psutil.process_iter():
         try:
@@ -126,14 +128,25 @@ def lanzarComando(admin, myList = [], *args):
 #        for x in myList:
 #            os.system(x)
 
+# =============================================================================
+# ~Convertir playlist a urls
+#        
+#        @link es la url de la playlist
+#        @return retorna una lista de url de cada video de la playlist de manera individual
+#        
+# =============================================================================
+def getPlaylistVideosURL(link):
+    results = youtube_dl.YoutubeDL({'quiet': True}).extract_info(link, download=False)
+    return [i['webpage_url'] for i in results['entries']] 
+
 
 # =============================================================================
 # ~Descargar url a mp3
-        
+#        
 #            @link url de youtube a descargar
 #            @titulo titulo que poner a la cancion
 # =============================================================================
-def descargar(link): #(link, titulo)
+def getMp3FromURL(link): #(link, titulo)
     """
     Download a song using youtube url and song title
     """
@@ -168,7 +181,7 @@ class mainClass(QMainWindow):
         
         
 # =============================================================================
-#         ~Eventos links
+# ~Eventos links
 # =============================================================================
         #Boton resetear explorer
         self.ui.pBResetExplorer.clicked.connect(self.resetExplorerClicked)      
@@ -182,14 +195,25 @@ class mainClass(QMainWindow):
         self.ui.pBForzarBorradoCarpeta.clicked.connect(self.borrarCarpetaClicked)
         #Boton bajar video
         self.ui.pBBajarVideo.clicked.connect(self.bajarVideoClicked)
+        #Boton bajar playlist
+        self.ui.pBPlaylistBajar.clicked.connect(self.bajarPlaylistClicked)
   
 
 
 # =============================================================================
-# ~Evento clicar boton descarga
+# ~Evento clicar boton descarga video
 # =============================================================================
     def bajarVideoClicked( self ):
-        descargar(self.ui.tEVideoBajar.toPlainText())
+        getMp3FromURL(self.ui.tEVideoBajar.toPlainText())
+        
+# =============================================================================
+# ~Evento clicar boton descarga playlist
+# =============================================================================
+    def bajarPlaylistClicked( self ):
+        playlist = getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())
+        for video in playlist:
+#            print(video) #printear url (debug)
+            getMp3FromURL(video)
         
 # =============================================================================
 # ~Evento resetear explorer
