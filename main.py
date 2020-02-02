@@ -59,24 +59,25 @@ def Messagebox(text, title, style):
 
 
 # =============================================================================
-# ~Seleccionar Ruta de fichero/carpeta
-#    
-#             @filtro => Sera el tipo de extension
-#             @guardar => Booleano para saber si se quiere cargar o guardar
-#               - 1 = guardar
-#               - 0 = cargar
-#             Ejemplo filtro: "xls(*.xls);;csv(*.csv)"  
-#    
+# ~Seleccionar Ruta de fichero/carpeta   
+#
+#    @filtro => Sera el tipo de extension
+#    @titulo  => Titulo de la ventana
+#    @guardar => Booleano para saber si se quiere cargar o guardar
+#    - 1 = guardar
+#    - 0 = cargar
+#    Ejemplo filtro: "xls(*.xls);;csv(*.csv)"  
+#
 # ============================================================================= 
-def seleccionarFichero(filtro, guardar, carpetas):
+def seleccionarFichero(filtro, titulo, guardar, carpetas):
     qFD = QFileDialog()
     if carpetas == 1:
-         return QFileDialog.getExistingDirectory(qFD,"Seleccionar archivo", "", qFD.ShowDirsOnly)
+         return QFileDialog.getExistingDirectory(qFD, titulo, "", qFD.ShowDirsOnly)
     else:        
         if guardar == 0:                   
-            return QFileDialog.getOpenFileName(qFD,"Seleccionar archivo", "",filtro)
+            return QFileDialog.getOpenFileName(qFD, titulo, "",filtro)
         elif guardar == 1:
-            return QFileDialog.getSaveFileName(qFD,"Seleccionar archivo", "",filtro)
+            return QFileDialog.getSaveFileName(qFD, titulo, "",filtro)
 
 
 # =============================================================================
@@ -144,17 +145,16 @@ def getPlaylistVideosURL(link):
 # ~Descargar url a mp3
 #        
 #            @link url de youtube a descargar
-#            @titulo titulo que poner a la cancion
+#            @rutaGuardar => path donde se guardaran el/los ficheros
+#    
 # =============================================================================
-def getMp3FromURL(link): #(link, titulo)
-    """
-    Download a song using youtube url and song title
-    """
-
-#    outtmpl = titulo + '.%(ext)s'
+def getMp3FromURL(link, rutaGuardar): 
+#    filetmpl = u'%(id)s_%(uploader_id)s_%(title)s.%(ext)s'
+#    print(rutaGuardar + "/")
+    outtmpl = rutaGuardar + '/%(title)s.%(ext)s'
     ydl_opts = {
         'format': 'bestaudio/best',
-#        'outtmpl': outtmpl,
+        'outtmpl': outtmpl,
         'postprocessors': [
             {
                 'key': 'FFmpegExtractAudio',
@@ -203,17 +203,19 @@ class mainClass(QMainWindow):
 # =============================================================================
 # ~Evento clicar boton descarga video
 # =============================================================================
-    def bajarVideoClicked( self ):
-        getMp3FromURL(self.ui.tEVideoBajar.toPlainText())
+    def bajarVideoClicked( self ):        
+        rutaGuardar = seleccionarFichero("", "Seleccionar destino de ficheros", 1, 1)
+        getMp3FromURL(self.ui.tEVideoBajar.toPlainText(), rutaGuardar)
         
 # =============================================================================
 # ~Evento clicar boton descarga playlist
 # =============================================================================
     def bajarPlaylistClicked( self ):
+        rutaGuardar = seleccionarFichero("", "Seleccionar destino de ficheros", 1, 1)
         playlist = getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())
         for video in playlist:
 #            print(video) #printear url (debug)
-            getMp3FromURL(video)
+            getMp3FromURL(video, rutaGuardar)
         
 # =============================================================================
 # ~Evento resetear explorer
@@ -293,8 +295,8 @@ class mainClass(QMainWindow):
 # =============================================================================
 # ~Evento seleccionar archivo
 # =============================================================================     
-    def seleccionarArchivoClicked(self):      
-        self.ui.lEArchivoBorrar.setText(seleccionarFichero("", 0, 0)[0])
+    def seleccionarArchivoClicked(self):
+        self.ui.lEArchivoBorrar.setText(seleccionarFichero("", "Seleccionar Archivo", 0, 0)[0])
         
         
         
@@ -302,7 +304,7 @@ class mainClass(QMainWindow):
 # ~Evento seleccionar carpeta
 # =============================================================================   
     def seleccionarCarpetaClicked(self):        
-        self.ui.lECarpetaBorrar.setText(seleccionarFichero("", 0, 1)[0])
+        self.ui.lECarpetaBorrar.setText(seleccionarFichero("", "Seleccionar carpeta", 0, 1)[0])
   
 
 ##############################################################################################
