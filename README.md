@@ -20,6 +20,6 @@ Some of this changes requiere adding or editing the register of windows
 
 ### Downloads
 
-- Download youtube videos to mp3 192Kbps
-- Download youtube playlist to mp3 videos 192Kbps in *one go*
+- Download youtube videos to mp3 (192Kbps)
+- Download youtube playlist to mp3 (192Kbps) in *one go*
 
