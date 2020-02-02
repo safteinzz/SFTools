@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>526</height>
+    <width>619</width>
+    <height>738</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,30 +42,73 @@
     <item>
      <widget class="QTabWidget" name="fixWin10">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tabResetExplorer">
+      <widget class="QWidget" name="yt2mp3">
        <attribute name="title">
-        <string>Resetear explorer</string>
+        <string>Youtube to MP3</string>
        </attribute>
-       <widget class="QPushButton" name="pBResetExplorer">
+       <widget class="QPushButton" name="pBBajarVideo">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>150</y>
           <width>91</width>
           <height>23</height>
          </rect>
         </property>
         <property name="text">
-         <string>Reset explorer</string>
+         <string>Download</string>
         </property>
        </widget>
-       <widget class="QLabel" name="lResetExplorer">
+       <widget class="QPushButton" name="pBPlaylistBajar">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>300</y>
+          <width>91</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Download</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lVideos">
         <property name="geometry">
          <rect>
           <x>10</x>
           <y>10</y>
+          <width>591</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;WARNING: Videos and playlists must be hidden or public, private videos are not findable by the app browser so using them will result on an URL error&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lPlaylists">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>220</y>
           <width>321</width>
           <height>17</height>
          </rect>
@@ -82,7 +125,94 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>Pulsa el boton para resetear explorador de windows</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Full playlist&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="tEVideoBajar">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>110</y>
+          <width>191</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="tEPlaylistBajar">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>260</y>
+          <width>191</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lVideos_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>321</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Single Video:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QPlainTextEdit" name="pTEStatus">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>390</y>
+          <width>591</width>
+          <height>271</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lPlaylists_3">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>360</y>
+          <width>321</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Status:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -91,7 +221,7 @@
       </widget>
       <widget class="QWidget" name="tabForceDelete">
        <attribute name="title">
-        <string>Forzar Borrado</string>
+        <string>Force Deletion</string>
        </attribute>
        <widget class="QLabel" name="lArchivos">
         <property name="geometry">
@@ -114,7 +244,7 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>Archivos:</string>
+         <string>Files:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -152,7 +282,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Examinar...</string>
+         <string>Find..</string>
         </property>
        </widget>
        <widget class="QPushButton" name="pBForzarBorradoArchivo">
@@ -165,7 +295,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Forzar borrado</string>
+         <string>Force delete</string>
         </property>
        </widget>
        <widget class="QPushButton" name="pBForzarBorradoCarpeta">
@@ -178,7 +308,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Forzar borrado</string>
+         <string>Force delete</string>
         </property>
        </widget>
        <widget class="QLabel" name="lCarpetas">
@@ -202,7 +332,7 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>Carpetas:</string>
+         <string>Folders:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -240,41 +370,28 @@
          </rect>
         </property>
         <property name="text">
-         <string>Examinar...</string>
+         <string>Find..</string>
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="yt2mp3">
+      <widget class="QWidget" name="tabResetExplorer">
        <attribute name="title">
-        <string>Youtube a MP3</string>
+        <string>Fixes</string>
        </attribute>
-       <widget class="QPushButton" name="pBBajarVideo">
+       <widget class="QPushButton" name="pBResetExplorer">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>90</y>
+          <y>50</y>
           <width>91</width>
           <height>23</height>
          </rect>
         </property>
         <property name="text">
-         <string>Descargar</string>
+         <string>Fix explorer</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="pBPlaylistBajar">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>240</y>
-          <width>91</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Descargar</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="lVideos">
+       <widget class="QLabel" name="lResetExplorer">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -295,13 +412,18 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>Videos:</string>
+         <string>Fix explorer for resolving navigation bugs</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="lPlaylists">
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Disconnect Bind</string>
+       </attribute>
+       <widget class="QLabel" name="lPlaylists_2">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -322,23 +444,70 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>Playlist:</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set Bind (click in the box and press key combination):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QTextEdit" name="tEVideoBajar">
+       <widget class="QLabel" name="lVideos_3">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
-          <width>191</width>
-          <height>31</height>
+          <y>10</y>
+          <width>591</width>
+          <height>41</height>
          </rect>
         </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Disconnect bind allows you to bind the instant disconnect from the internet for any applicatión you choose within the settings on this tab&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
        </widget>
-       <widget class="QTextEdit" name="tEPlaylistBajar">
+       <widget class="QLabel" name="lVideos_4">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>321</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Choose what application will get closed</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="tEPlaylistBajar_2">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -348,16 +517,94 @@
          </rect>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>win10 Fixes</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>DC </string>
-       </attribute>
+       <widget class="QPushButton" name="pBPlaylistBajar_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>240</y>
+          <width>91</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pBSeleccionarArchivoBorrar_2">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>110</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Find..</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lEArchivoBorrar_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>110</y>
+          <width>161</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QTableView" name="tablaBindings">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>370</y>
+          <width>591</width>
+          <height>301</height>
+         </rect>
+        </property>
+        <property name="gridStyle">
+         <enum>Qt::DashLine</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lPlaylists_4">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>340</y>
+          <width>321</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Binds:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -371,7 +618,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>616</width>
+     <width>619</width>
      <height>18</height>
     </rect>
    </property>
