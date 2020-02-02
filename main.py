@@ -7,10 +7,21 @@ Created on Sat Jan 25 18:15:26 2020
 
 #Imports
 
+
 import sys
+
+#Procesos
+import psutil
+from subprocess import check_output,Popen, PIPE
 
 #comandos cmd
 import os
+import win32com.shell.shell as shell
+
+
+#youtube conversor
+import youtube_dl
+
 
 #Ventana
 from PyQt5 import uic
@@ -23,6 +34,7 @@ from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
 
 #Importar interfaz
 Ui_MainWindow, QtBaseClass = uic.loadUiType("interfazMain.ui")
+
 
 
 
@@ -67,6 +79,20 @@ def seleccionarFichero(filtro, guardar, carpetas):
             return QFileDialog.getSaveFileName(qFD,"Seleccionar archivo", "",filtro)
 
 
+
+def has_handle(fpath):
+    for proc in psutil.process_iter():
+        try:
+            for item in proc.open_files():
+                if fpath == item.path:
+                    return True
+        except Exception:
+            pass
+
+    return False
+
+
+
 # =============================================================================
 # ~Lanzar comando por cmd
 #            
@@ -74,11 +100,62 @@ def seleccionarFichero(filtro, guardar, carpetas):
 #            
 # =============================================================================
  
-def lanzarComando(myList = [], *args):
-    for x in myList:
-        os.system(x)
-##############################################################################################
-#Fin de metodo  
+def lanzarComando(admin, myList = [], *args):
+    filename = "C:/Users/SaFteiNZz/Documents/!testdelete/New Microsoft Word Document.docx"
+    if has_handle(filename):
+        print('holis')
+    
+#    for proc in psutil.process_iter():
+#        try:
+#            # this returns the list of opened files by the current process
+#            flist = proc.open_files()
+#            if flist:
+#                print(proc.pid,proc.name)
+#                for nt in flist:
+#                    print("\t",nt.path)
+#    
+#        # This catches a race condition where a process ends
+#        # before we can examine its files    
+#        except psutil.NoSuchProcess as err:
+#            print("****",err) 
+    
+#    if admin == 1:
+#        for x in myList:
+#            shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+x)
+#    else:        
+#        for x in myList:
+#            os.system(x)
+
+
+# =============================================================================
+# ~Descargar url a mp3
+        
+#            @link url de youtube a descargar
+#            @titulo titulo que poner a la cancion
+# =============================================================================
+def descargar(link): #(link, titulo)
+    """
+    Download a song using youtube url and song title
+    """
+
+#    outtmpl = titulo + '.%(ext)s'
+    ydl_opts = {
+        'format': 'bestaudio/best',
+#        'outtmpl': outtmpl,
+        'postprocessors': [
+            {
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }
+        ],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(link, download=True) 
+
+
+
 
 # =============================================================================
 # ~Clase main
@@ -103,7 +180,16 @@ class mainClass(QMainWindow):
         self.ui.pBSeleccionarCarpetaBorrar.clicked.connect(self.seleccionarCarpetaClicked)
         #Boton forzar borrado carpeta
         self.ui.pBForzarBorradoCarpeta.clicked.connect(self.borrarCarpetaClicked)
-        
+        #Boton bajar video
+        self.ui.pBBajarVideo.clicked.connect(self.bajarVideoClicked)
+  
+
+
+# =============================================================================
+# ~Evento clicar boton descarga
+# =============================================================================
+    def bajarVideoClicked( self ):
+        descargar(self.ui.tEVideoBajar.toPlainText())
         
 # =============================================================================
 # ~Evento resetear explorer
@@ -122,7 +208,7 @@ class mainClass(QMainWindow):
 # =============================================================================
     def resetExplorerClicked(self):
         comandos = ["taskkill /f /im explorer.exe", "start explorer.exe"]        
-        lanzarComando(comandos)
+        lanzarComando(0, comandos)
         
         
         
@@ -147,8 +233,18 @@ class mainClass(QMainWindow):
 #        
 # =============================================================================     
     def borrarArchivoClicked(self):
-        comandos = ["taskkill /f /im explorer.exe", "del /f " + self.ui.lEArchivoBorrar.Text(), "start explorer.exe"]
-        lanzarComando(comandos)
+        head, tail = os.path.split(self.ui.lEArchivoBorrar.text())
+#        print(self.ui.lEArchivoBorrar.text())
+#        print(head + "   "  + tail)
+        print('del /f ' + self.ui.lEArchivoBorrar.text())
+        comandos = ["taskkill /f /im explorer.exe"]
+        lanzarComando(0, comandos)
+        comandos = ["del /f " + self.ui.lEArchivoBorrar.text()]
+        lanzarComando(1, comandos)
+        comandos = ["start explorer.exe"]
+        lanzarComando(0, comandos)
+#        comandos = ["taskkill /f /im explorer.exe", "cd " + head, "del /f " + tail, "start explorer.exe"]
+#        lanzarComando(1, comandos)
         
         
         
@@ -165,8 +261,8 @@ class mainClass(QMainWindow):
 #        
 # =============================================================================
     def borrarCarpetaClicked(self):
-        comandos = ["taskkill /f /im explorer.exe", "rd /s /q " + self.ui.lECarpetaBorrar.Text(), "start explorer.exe"]
-        lanzarComando(comandos)
+        comandos = ["taskkill /f /im explorer.exe", "rd /s /q " + self.ui.lECarpetaBorrar.text(), "start explorer.exe"]
+        lanzarComando(1, comandos)
         
         
         
