@@ -21,6 +21,7 @@ import win32com.shell.shell as shell
 #sleep y threading
 from threading import Thread
 from time import sleep
+from queue import Queue
 
 #youtube conversor (https://github.com/ytdl-org/youtube-dl)
 import youtube_dl
@@ -203,15 +204,17 @@ class mainClass(QMainWindow):
     
     # =============================================================================
     # ~Descargar url a mp3
-    #        
-    #            @link url de youtube a descargar
-    #            @rutaGuardar => path donde se guardaran el/los ficheros
+    #        Funciona como worker (threading queue)
+    #            @q => cola
     #    
     # =============================================================================
-    def getMp3FromURL( self, link, rutaGuardar):         
+    def getMp3FromURL( self, q):         
+        args = q.get() 
+        
     #    filetmpl = u'%(id)s_%(uploader_id)s_%(title)s.%(ext)s'
     #    print(rutaGuardar + "/")
-        outtmpl = rutaGuardar + '/%(title)s.%(ext)s'
+    
+        outtmpl = args[0] + '/%(title)s.%(ext)s'
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': outtmpl,
@@ -227,22 +230,28 @@ class mainClass(QMainWindow):
         }
     
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([link])
+            ydl.download([args[1]])
+            
+            
 #            info_dict = ydl.extract_info(link, download=True)            
     #    print(info_dict)
+        q.task_done()
 
     # =============================================================================
     # ~Hook para estado descargas
+    #        Funciona como worker (threading queue)
+    #            @q => cola
+    #
     # =============================================================================
-    def my_hook( self, d):
+#    def my_hook( self, d):
 #        self.ui.pTEStatus.appendPlainText(d['status'])
-        if d['status'] == 'downloading':
-            print('Downloading (' + d['_percent_str'] + ')  -- Estimated time left:' + d['_eta_str']) 
-            self.apender('Downloading (' + d['_percent_str'] + ')  -- Estimated time left:' + d['_eta_str'])         
+#        if d['status'] == 'downloading':
+#            print('Downloading (' + d['_percent_str'] + ')  -- Estimated time left:' + d['_eta_str']) 
+#            self.apender('Downloading (' + d['_percent_str'] + ')  -- Estimated time left:' + d['_eta_str'])         
            
-        elif d['status'] == 'finished':
-            print('Done downloading, now converting ...')
-            self.apender('Done downloading, now converting ...')
+#        elif d['status'] == 'finished':
+#            print('Done downloading, now converting ...')
+#            self.apender('Done downloading, now converting ...')
            
        
     def apender(self , st):
@@ -254,28 +263,37 @@ class mainClass(QMainWindow):
     def bajarVideoClicked( self ):     
         self.ui.pTEStatus.appendPlainText('Begining download ..')
         rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
-        sleep(.300)
-        self.getMp3FromURL(self.ui.tEVideoBajar.toPlainText(), rutaGuardar)
+        sleep(1)
+        thread = Thread(target = self.getMp3FromURL, args = (self.ui.tEVideoBajar.toPlainText(), rutaGuardar, ))
+        thread.start()
+        print("Waiting for download to complete")
+        thread.join()
+        print("All done")
         self.ui.pTEStatus.appendPlainText('Download Finished')
         
     # =============================================================================
     # ~Evento clicar boton descarga playlist
     # =============================================================================
     def bajarPlaylistClicked( self ):
-        cont = 1
+        q = Queue()        
+        num_threads = 10
+        for i in range(num_threads):
+            worker = Thread(target=self.getMp3FromURL, args=(q,))
+            worker.setDaemon(True)
+            worker.start()
+        
         self.ui.pTEStatus.appendPlainText('Begining download ..')
         rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
-        sleep(.300)
+        
+        sleep(1)
         playlist = self.getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())
         for video in playlist:
-            self.ui.pTEStatus.appendPlainText('\nBegining download of file number: ' + str(cont))
 #            print(video) #printear url (debug)
-            thread = Thread(target = self.getMp3FromURL, args = (video, rutaGuardar, ))
-            thread.start()
-#            self.getMp3FromURL(video, rutaGuardar)
-            ++cont
-            print('ES UN PUTO HILO')
-            
+            q.put((video, rutaGuardar))     
+        
+        print("Download of ", q.qsize(), "files started")
+        q.join()
+        print("All done")
 
         self.ui.pTEStatus.appendPlainText('Playlist downloaded correctly')
         
