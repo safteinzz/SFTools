@@ -10,6 +10,8 @@ Created on Sat Jan 25 18:15:26 2020
 
 import sys
 
+
+
 #Procesos
 import psutil
 from subprocess import check_output,Popen, PIPE
@@ -34,6 +36,8 @@ from PyQt5 import uic
 #Messagebox
 import ctypes
 
+#PyQT5
+from PyQt5 import QtGui, QtCore
 #Widgets pyQT5
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
 
@@ -193,14 +197,55 @@ class mainClass(QMainWindow):
         self.ui.pBPlaylistBajar.clicked.connect(self.bajarPlaylistClicked)
         
         #Text edit video bajar
-        self.ui.tEVideoBajar.mousePressEvent = self.tEVideoBajarClicked()
+        self.ui.tEVideoBajar.mousePressEvent = self.tEVideoBajarClicked        
+        #Text edit playlist bajar
+        self.ui.tEPlaylistBajar.mousePressEvent = self.tEPlaylistBajarClicked
 
-
-
-    def tEVideoBajarClicked( self ):
-        self.ui.tEVideoBajar.setText('')        
-        print('test')
-        self.ui.tEVideoBajar.mousePressEvent = self.tEVideoBajarClicked()
+# =============================================================================
+# ~Funciones eventos
+# =============================================================================
+        
+        
+# =============================================================================
+#     ~Evento clickar QTextEdit VideoBajar  
+# =============================================================================
+    def tEVideoBajarClicked(self, event):
+        self.ui.tEVideoBajar.setText('')
+        self.ui.tEVideoBajar.setTextColor(QtGui.QColor(0,0,0))
+   
+# =============================================================================
+#     ~Evento clickar QTextEdit PlaylistBajar     
+# =============================================================================
+    def tEPlaylistBajarClicked(self, event): 
+        self.ui.tEPlaylistBajar.setText('')
+        self.ui.tEPlaylistBajar.setTextColor(QtGui.QColor(0,0,0))
+ 
+    
+# =============================================================================
+#     ~Evento clicar boton descarga videoç
+#        Se crea un hilo y se le asigna el trabajo
+# =============================================================================
+    def bajarVideoClicked( self ): 
+        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
+        if not rutaGuardar:
+            Messagebox('You must enter a path in order to download', 'Error', 1)        
+            return 
+        
+        mainWorker = Thread(target=self.bajarVideo, args=(rutaGuardar,))
+        mainWorker.start()
+        
+# =============================================================================
+#     ~Evento clicar boton descarga playlist
+#        Se crea un hilo y se le asigna el trabajo
+# =============================================================================
+    def bajarPlaylistClicked( self ): 
+        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)        
+        if not rutaGuardar:
+            Messagebox('You must enter a path in order to download', 'Error', 1)        
+            return 
+        
+        mainWorker = Thread(target=self.bajarPlaylist, args=(rutaGuardar, ))
+        mainWorker.start()
 
 # =============================================================================
 #     ~Hook para estado descargas
@@ -305,19 +350,7 @@ class mainClass(QMainWindow):
     def bajarVideo( self , rutaGuardar):
         self.downloadPlaylist([self.ui.tEVideoBajar.toPlainText()], rutaGuardar)
         
-# =============================================================================
-#     ~Evento clicar boton descarga videoç
-#        Se crea un hilo y se le asigna el trabajo
-# =============================================================================
-    def bajarVideoClicked( self ): 
-        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
-        if not rutaGuardar:
-            Messagebox('You must enter a path in order to download', 'Error', 1)        
-            return 
-        
-        mainWorker = Thread(target=self.bajarVideo, args=(rutaGuardar,))
-        mainWorker.start()
-        
+
         
 
 # =============================================================================
@@ -330,18 +363,7 @@ class mainClass(QMainWindow):
         playlist = self.getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())        
         self.downloadPlaylist(playlist, rutaGuardar)
         
-# =============================================================================
-#     ~Evento clicar boton descarga playlist
-#        Se crea un hilo y se le asigna el trabajo
-# =============================================================================
-    def bajarPlaylistClicked( self ): 
-        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)        
-        if not rutaGuardar:
-            Messagebox('You must enter a path in order to download', 'Error', 1)        
-            return 
-        
-        mainWorker = Thread(target=self.bajarPlaylist, args=(rutaGuardar, ))
-        mainWorker.start()
+
         
         
 # =============================================================================
