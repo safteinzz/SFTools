@@ -22,7 +22,6 @@ import win32com.shell.shell as shell
 from threading import Thread
 from time import sleep
 from queue import Queue
-from qtpy.QtCore import Qt, QFileSystemWatcher, QSettings, Signal
 
 #youtube conversor (https://github.com/ytdl-org/youtube-dl)
 import youtube_dl
@@ -163,19 +162,15 @@ class MyLogger(object):
 # ~Clase main
 # =============================================================================
 class mainClass(QMainWindow):
-    
-    finished = Signal()
-    updateProgress = Signal(str)
-
     def __init__(self):
         super(mainClass, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
-        self.updateProgress.connect(self.ui.pTEStatus.appendPlainText)
         
-# =============================================================================
-#         ~Eventos links
-# =============================================================================
+        
+        # =============================================================================
+        # ~Eventos links
+        # =============================================================================
         #Botones
         #Boton resetear explorer
         self.ui.pBResetExplorer.clicked.connect(self.resetExplorerClicked)      
@@ -194,52 +189,32 @@ class mainClass(QMainWindow):
         
         #Text edit video bajar
 #        self.ui.tEVideoBajar.clicked.connect(self.tEVideoBajarClicked)
-
-# =============================================================================
-#     ~Hook para estado descargas
-#            Funciona como worker (threading queue)
-#                @q => cola
-#
-# =============================================================================
-    def myHook( self, d):
-        if d['status'] == 'downloading':
-            self.updateProgress.emit('Downloading ' +  os.path.splitext(os.path.basename(os.path.normpath(d['filename'])))[0] + '(' + d['_percent_str'] + ' )')      
-           
-        elif d['status'] == 'finished':
-            self.updateProgress.emit('! Done downloading ' +  os.path.splitext(os.path.basename(os.path.normpath(d['filename'])))[0] + ', now deleting additional files...')
-            
-        elif d['status'] == 'error':
-            self.updateProgress.emit('ERROR WHILE DOWNOLOADING ' +  os.path.splitext(os.path.basename(os.path.normpath(d['filename'])))[0])
-
-   
-# =============================================================================
-#     ~Convertir playlist a urls
-#        
-#            @link es la url de la playlist
-#            @return retorna una lista de url de cada video de la playlist de manera individual
-#        
-# =============================================================================
+  
+    # =============================================================================
+    # ~Convertir playlist a urls
+    #        
+    #        @link es la url de la playlist
+    #        @return retorna una lista de url de cada video de la playlist de manera individual
+    #        
+    # =============================================================================
     def getPlaylistVideosURL(self, link):
         results = youtube_dl.YoutubeDL({'quiet': True}).extract_info(link, download=False)
         return [i['webpage_url'] for i in results['entries']] 
     
     
-    def worker( self, que):
-        while True:
-            args = que.get()
-            self.getMp3FromURL(args[1], args[0])
-            que.task_done()
+    # =============================================================================
+    # ~Descargar url a mp3
+    #        Funciona como worker (threading queue)
+    #            @q => cola
+    #    
+    # =============================================================================
+    def getMp3FromURL( self, q):         
+        args = q.get() 
+        
+    #    filetmpl = u'%(id)s_%(uploader_id)s_%(title)s.%(ext)s'
+    #    print(rutaGuardar + "/")
     
-# =============================================================================
-#     ~Descargar url a mp3
-#    
-# =============================================================================
-    def getMp3FromURL( self, rutaGuardado, enlace):         
-#        print(' -' + args[0] + '- ')
-#        filetmpl = u'%(id)s_%(uploader_id)s_%(title)s.%(ext)s'
-#        print(rutaGuardar + "/")
-    
-        outtmpl = rutaGuardado + '/%(title)s.%(ext)s'
+        outtmpl = args[0] + '/%(title)s.%(ext)s'
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': outtmpl,
@@ -250,123 +225,119 @@ class mainClass(QMainWindow):
                     'preferredquality': '192',
                 }
             ],
-            'progress_hooks': [self.myHook],
+            'logger': MyLogger(),
+            'progress_hooks': [self.my_hook],
         }
     
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([enlace])
-#            info_dict = ydl.extract_info(link, download=True)  
+            ydl.download([args[1]])
             
-#        print(info_dict)
-    
-# =============================================================================
-#     ~Programador de descargas
-# =============================================================================
-    def downloadPlaylist(self, playlist, rutaGuardar):
-        
-        length = len(playlist)
-        
-        if length <= 1:               
-            num_threads = 1
-        elif length <= 3:
-            num_threads = length
-        #Maximo de hilos 3
-        else:
-            num_threads = 3
             
-        que = Queue() 
+#            info_dict = ydl.extract_info(link, download=True)            
+    #    print(info_dict)
+        q.task_done()
+
+    # =============================================================================
+    # ~Hook para estado descargas
+    #        Funciona como worker (threading queue)
+    #            @q => cola
+    #
+    # =============================================================================
+#    def my_hook( self, d):
+#        self.ui.pTEStatus.appendPlainText(d['status'])
+#        if d['status'] == 'downloading':
+#            print('Downloading (' + d['_percent_str'] + ')  -- Estimated time left:' + d['_eta_str']) 
+#            self.apender('Downloading (' + d['_percent_str'] + ')  -- Estimated time left:' + d['_eta_str'])         
+           
+#        elif d['status'] == 'finished':
+#            print('Done downloading, now converting ...')
+#            self.apender('Done downloading, now converting ...')
+           
+       
+    def apender(self , st):
+        self.ui.pTEStatus.appendPlainText(st)
+   
+    # =============================================================================
+    # ~Evento clicar boton descarga video
+    # =============================================================================
+    def bajarVideoClicked( self ):     
+        self.ui.pTEStatus.appendPlainText('Begining download ..')
+        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
+        sleep(1)
+        thread = Thread(target = self.getMp3FromURL, args = (self.ui.tEVideoBajar.toPlainText(), rutaGuardar, ))
+        thread.start()
+        print("Waiting for download to complete")
+        thread.join()
+        print("All done")
+        self.ui.pTEStatus.appendPlainText('Download Finished')
+        
+    # =============================================================================
+    # ~Evento clicar boton descarga playlist
+    # =============================================================================
+    def bajarPlaylistClicked( self ):
+        q = Queue()        
+        num_threads = 10
         for i in range(num_threads):
-            worker = Thread(target=self.worker, args=(que,))
+            worker = Thread(target=self.getMp3FromURL, args=(q,))
             worker.setDaemon(True)
             worker.start()
-            
-#        self.updateProgress.emit('Begining download ..\n')
         
+        self.ui.pTEStatus.appendPlainText('Begining download ..')
+        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
+        
+        sleep(1)
+        playlist = self.getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())
         for video in playlist:
 #            print(video) #printear url (debug)
-            que.put((video, rutaGuardar))     
+            q.put((video, rutaGuardar))     
         
-        self.updateProgress.emit('Download of ' + str(que.qsize()) + ' files started !')
-        que.join()
-    
-    
-    
-    def bajarVideo( self , rutaGuardar):
-        self.downloadPlaylist([self.ui.tEVideoBajar.toPlainText()], rutaGuardar)
-        
-# =============================================================================
-#     ~Evento clicar boton descarga video
-# =============================================================================
-    def bajarVideoClicked( self ): 
-        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
-        mainWorker = Thread(target=self.bajarVideo, args=(rutaGuardar,))
-        mainWorker.start()
-        
+        print("Download of ", q.qsize(), "files started")
+        q.join()
+        print("All done")
 
-
-    def bajarPlaylist( self ):
+        self.ui.pTEStatus.appendPlainText('Playlist downloaded correctly')
         
-        self.updateProgress.emit('Begining Download...')
-        self.updateProgress.emit('Extracting URLs...')
-        playlist = self.getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())        
-        self.downloadPlaylist(playlist, rutaGuardar)
-        
-# =============================================================================
-#     ~Evento clicar boton descarga playlist
-# =============================================================================
-    def bajarPlaylistClicked( self ): 
-        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
-        mainWorker = Thread(target=self.bajarPlaylist)
-        mainWorker.start()
-        
-        
-        
-    
-        
-        
-        
-        
-# =============================================================================
-#     ~Evento resetear explorer
-#        
-#            taskkill [/s <computer> [/u [<Domain>\]<UserName> [/p [<Password>]]]] {[/fi <Filter>] [...] [/pid <ProcessID> | /im <ImageName>]} [/f] [/t]
-#        
-#            /s <computer>	Specifies the name or IP address of a remote computer (do not use backslashes). The default is the local computer.
-#            /u <Domain>\<UserName>	Runs the command with the account permissions of the user who is specified by UserName or Domain\UserName. /u can be specified only if /s is specified. The default is the permissions of the user who is currently logged on to the computer that is issuing the command.
-#            /p <Password>	Specifies the password of the user account that is specified in the /u parameter.
-#            /fi <Filter>	Applies a filter to select a set of tasks. You can use more than one filter or use the wildcard character (\*) to specify all tasks or image names. See the following table for valid filter names, operators, and values.
-#            /pid <ProcessID>	Specifies the process ID of the process to be terminated.
-#            /im <ImageName>	Specifies the image name of the process to be terminated. Use the wildcard character (\*) to specify all image names.
-#            /f	Specifies that processes be forcefully terminated. This parameter is ignored for remote processes; all remote processes are forcefully terminated.
-#            /t	Terminates the specified process and any child processes started by it.
-#
-# =============================================================================
+    # =============================================================================
+    # ~Evento resetear explorer
+    #        
+    #        taskkill [/s <computer> [/u [<Domain>\]<UserName> [/p [<Password>]]]] {[/fi <Filter>] [...] [/pid <ProcessID> | /im <ImageName>]} [/f] [/t]
+    #        
+    #        /s <computer>	Specifies the name or IP address of a remote computer (do not use backslashes). The default is the local computer.
+    #        /u <Domain>\<UserName>	Runs the command with the account permissions of the user who is specified by UserName or Domain\UserName. /u can be specified only if /s is specified. The default is the permissions of the user who is currently logged on to the computer that is issuing the command.
+    #        /p <Password>	Specifies the password of the user account that is specified in the /u parameter.
+    #        /fi <Filter>	Applies a filter to select a set of tasks. You can use more than one filter or use the wildcard character (\*) to specify all tasks or image names. See the following table for valid filter names, operators, and values.
+    #        /pid <ProcessID>	Specifies the process ID of the process to be terminated.
+    #        /im <ImageName>	Specifies the image name of the process to be terminated. Use the wildcard character (\*) to specify all image names.
+    #        /f	Specifies that processes be forcefully terminated. This parameter is ignored for remote processes; all remote processes are forcefully terminated.
+    #        /t	Terminates the specified process and any child processes started by it.
+    #
+    # =============================================================================
     def resetExplorerClicked(self):
         comandos = ["taskkill /f /im explorer.exe", "start explorer.exe"]        
         lanzarComando(0, comandos)
         
         
         
-# =============================================================================
-#     ~Evento borrar archivo
-#        
-#            del [/p] [/f] [/s] [/q] [/a[:]<attributes>] filename [/?]
-#
-#            Brush up on how to read command syntax if you're not sure how to interpret the del command syntax as it's described above or in the list below.
-#        
-#            /p = Prompts for confirmation before deleting each file.
-#            /f = Force deletes read-only files.
-#            /s = Deletes the specified files from all the subdirectories.
-#            /q = Quiet mode; suppresses prompts for delete confirmations.
-#            /a:<attributes> = Deletes files based on one of the following attributes:
-#            r = Read-only files
-#            h = Hidden files
-#            i = Not content indexed files
-#            s = System files
-#            a = Files ready for archiving
-#            l = Reparse points
-#        
-# =============================================================================     
+    # =============================================================================
+    # ~Evento borrar archivo
+    #        
+    #        del [/p] [/f] [/s] [/q] [/a[:]<attributes>] filename [/?]
+    #
+    #        Brush up on how to read command syntax if you're not sure how to interpret the del command syntax as it's described above or in the list below.
+    #        
+    #        /p = Prompts for confirmation before deleting each file.
+    #        /f = Force deletes read-only files.
+    #        /s = Deletes the specified files from all the subdirectories.
+    #        /q = Quiet mode; suppresses prompts for delete confirmations.
+    #        /a:<attributes> = Deletes files based on one of the following attributes:
+    #        r = Read-only files
+    #        h = Hidden files
+    #        i = Not content indexed files
+    #        s = System files
+    #        a = Files ready for archiving
+    #        l = Reparse points
+    #        
+    # =============================================================================     
     def borrarArchivoClicked(self):
         head, tail = os.path.split(self.ui.lEArchivoBorrar.text())
 #        print(self.ui.lEArchivoBorrar.text())
@@ -383,32 +354,35 @@ class mainClass(QMainWindow):
         
         
         
-# =============================================================================
-#     ~Evento borrar carpeta
-#        
-#            RMDIR [/S] [/Q] [drive:]path
-#            RD [/S] [/Q] [drive:]path        
-#            /S Removes all directories and files in the specified directory in addition to the directory itself. Used to remove a directory tree.        
-#            /Q Quiet mode, do not ask if ok to remove a directory tree with /S
-#        
-# =============================================================================
+    # =============================================================================
+    # ~Evento borrar carpeta
+    #        
+    #        RMDIR [/S] [/Q] [drive:]path
+    #
+    #        RD [/S] [/Q] [drive:]path
+    #        
+    #        /S Removes all directories and files in the specified directory in addition to the directory itself. Used to remove a directory tree.
+    #        
+    #        /Q Quiet mode, do not ask if ok to remove a directory tree with /S
+    #        
+    # =============================================================================
     def borrarCarpetaClicked(self):
         comandos = ["taskkill /f /im explorer.exe", "rd /s /q " + self.ui.lECarpetaBorrar.text(), "start explorer.exe"]
         lanzarComando(1, comandos)
         
         
         
-# =============================================================================
-#     ~Evento seleccionar archivo
-# =============================================================================     
+    # =============================================================================
+    # ~Evento seleccionar archivo
+    # =============================================================================     
     def seleccionarArchivoClicked(self):
         self.ui.lEArchivoBorrar.setText(seleccionarFichero("", "Seleccionar Archivo", 0, 0)[0])
         
         
         
-# =============================================================================
-#     ~Evento seleccionar carpeta
-# =============================================================================   
+    # =============================================================================
+    # ~Evento seleccionar carpeta
+    # =============================================================================   
     def seleccionarCarpetaClicked(self):        
         self.ui.lECarpetaBorrar.setText(seleccionarFichero("", "Seleccionar carpeta", 0, 1)[0])
   

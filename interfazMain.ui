@@ -44,7 +44,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tabyt2mp3">
+      <widget class="QWidget" name="yt2mp3">
        <attribute name="title">
         <string>Youtube to MP3</string>
        </attribute>
@@ -220,9 +220,6 @@
        </widget>
       </widget>
       <widget class="QWidget" name="tabForceDelete">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
        <attribute name="title">
         <string>Force Deletion</string>
        </attribute>
@@ -255,7 +252,7 @@
        </widget>
        <widget class="QLineEdit" name="lEArchivoBorrar">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="geometry">
          <rect>
@@ -343,7 +340,7 @@
        </widget>
        <widget class="QLineEdit" name="lECarpetaBorrar">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="geometry">
          <rect>
@@ -422,10 +419,7 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tabDCBind">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
+      <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Disconnect Bind</string>
        </attribute>
@@ -551,7 +545,7 @@
        </widget>
        <widget class="QLineEdit" name="lEArchivoBorrar_2">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="geometry">
          <rect>
