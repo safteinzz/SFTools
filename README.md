@@ -7,7 +7,7 @@ This is a simple application with interface that features different fixes and to
 
 ## Features
 
-### Deleting (work in progress
+### Deleting (work in progress)
 - Force deleting of files locked by the system for what ever reason
 - Force recursive deleting of folder locked for the system or that have inside them any file locked by the system
 
