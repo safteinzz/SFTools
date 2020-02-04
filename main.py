@@ -77,7 +77,7 @@ def Messagebox(text, title, style):
 def seleccionarFichero(filtro, titulo, guardar, carpetas):
     qFD = QFileDialog()
     if carpetas == 1:
-         return QFileDialog.getExistingDirectory(qFD, titulo, "", qFD.ShowDirsOnly)
+        return QFileDialog.getExistingDirectory(qFD, titulo, "", QFileDialog.ShowDirsOnly)
     else:        
         if guardar == 0:                   
             return QFileDialog.getOpenFileName(qFD, titulo, "",filtro)
@@ -193,7 +193,14 @@ class mainClass(QMainWindow):
         self.ui.pBPlaylistBajar.clicked.connect(self.bajarPlaylistClicked)
         
         #Text edit video bajar
-#        self.ui.tEVideoBajar.clicked.connect(self.tEVideoBajarClicked)
+        self.ui.tEVideoBajar.mousePressEvent = self.tEVideoBajarClicked()
+
+
+
+    def tEVideoBajarClicked( self ):
+        self.ui.tEVideoBajar.setText('')        
+        print('test')
+        self.ui.tEVideoBajar.mousePressEvent = self.tEVideoBajarClicked()
 
 # =============================================================================
 #     ~Hook para estado descargas
@@ -291,21 +298,33 @@ class mainClass(QMainWindow):
     
     
     
+# =============================================================================
+#     ~Lanzar acción bajar video
+#        Se ejecuta desde otro hilo para evitar freeze de GUI
+# =============================================================================
     def bajarVideo( self , rutaGuardar):
         self.downloadPlaylist([self.ui.tEVideoBajar.toPlainText()], rutaGuardar)
         
 # =============================================================================
-#     ~Evento clicar boton descarga video
+#     ~Evento clicar boton descarga videoç
+#        Se crea un hilo y se le asigna el trabajo
 # =============================================================================
     def bajarVideoClicked( self ): 
         rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
+        if not rutaGuardar:
+            Messagebox('You must enter a path in order to download', 'Error', 1)        
+            return 
+        
         mainWorker = Thread(target=self.bajarVideo, args=(rutaGuardar,))
         mainWorker.start()
         
-
-
-    def bajarPlaylist( self ):
         
+
+# =============================================================================
+#     ~Lanzar acción bajar Playlist
+#        Se ejecuta desde otro hilo para evitar freeze de GUI
+# =============================================================================
+    def bajarPlaylist( self , rutaGuardar):        
         self.updateProgress.emit('Begining Download...')
         self.updateProgress.emit('Extracting URLs...')
         playlist = self.getPlaylistVideosURL(self.ui.tEPlaylistBajar.toPlainText())        
@@ -313,17 +332,16 @@ class mainClass(QMainWindow):
         
 # =============================================================================
 #     ~Evento clicar boton descarga playlist
+#        Se crea un hilo y se le asigna el trabajo
 # =============================================================================
     def bajarPlaylistClicked( self ): 
-        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)
-        mainWorker = Thread(target=self.bajarPlaylist)
+        rutaGuardar = seleccionarFichero("", "Extract path", 1, 1)        
+        if not rutaGuardar:
+            Messagebox('You must enter a path in order to download', 'Error', 1)        
+            return 
+        
+        mainWorker = Thread(target=self.bajarPlaylist, args=(rutaGuardar, ))
         mainWorker.start()
-        
-        
-        
-    
-        
-        
         
         
 # =============================================================================
